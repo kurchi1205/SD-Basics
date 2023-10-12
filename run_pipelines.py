@@ -98,7 +98,7 @@ def get_images_with_variant_loss(prompt: str, version: str, rgb_value: List, num
 
 if __name__ == "__main__":
     prompt = "A cute kitten"
-    version = 'v1'
+    version = 'v2'
     # rgb_value = [249, 55, 255]
     # rgb_value = [255, 206, 51]
     rgb_value = [255, 165, 0]
