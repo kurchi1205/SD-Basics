@@ -44,8 +44,8 @@ def get_pipelines(version: str):
     return pipeline
 
 
-def load_styles():
-    styles = ['herge-style', 'nebula', 'dreamcore'\
-              'orientalist-art', 'minecraft-concept-art']
-    for style in styles:
-        torch.load(f"styles/{style}_learned_embeds.bin")
+def load_styles(style):
+#     styles = ['herge', 'nebula', 'dreamcore',\
+#               'orientalist-art', 'minecraft-concept-art']
+    
+    torch.load(f"styles/{style}_learned_embeds.bin")
