@@ -7,14 +7,15 @@ from pipelines import get_pipelines
 from utils import set_timesteps, latents_to_pil
 
 
-def get_images_with_variant_loss(prompt: str, version: str, rgb_value: List, num_images: int, steps: int, height: int, width: int, guidance_scale: float, seed: int = 100, variant_loss_scale: int = 200, save_images=True):
+def get_images_with_variant_loss(prompt: str, version: str, rgb_value: List, num_images: int, steps: int, height: int, width: int, guidance_scale: float, seed: int = 32, variant_loss_scale: int = 200, save_images=True):
     pipeline = get_pipelines(version=version)
-    tokenizer = pipeline['tokenizer']
-    text_encoder = pipeline['text_encoder']
-    vae = pipeline['vae']
-    unet = pipeline['unet']
-    scheduler = pipeline['scheduler']
     torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+    tokenizer = pipeline['tokenizer']
+    text_encoder = pipeline['text_encoder'].to(torch_device)
+    vae = pipeline['vae'].to(torch_device)
+    unet = pipeline['unet'].to(torch_device)
+    scheduler = pipeline['scheduler']
     generator = torch.manual_seed(seed)   # Seed generator to create the inital latent noise
 
     text_input = tokenizer([prompt], padding="max_length", max_length=tokenizer.model_max_length, truncation=True, return_tensors="pt")
@@ -91,17 +92,20 @@ def get_images_with_variant_loss(prompt: str, version: str, rgb_value: List, num
         if not os.path.exists('Results'):
             os.makedirs('Results')
         for i, image in enumerate(images):
-            image.save(f'Results/{i}.png')
+            image.save(f'Results/{i}_({rgb_value[0]}, {rgb_value[1]}, {rgb_value[2]}).png')
     return images
 
 
 if __name__ == "__main__":
-    prompt = "A boy riding a bicycle"
+    prompt = "A cute kitten"
     version = 'v1'
-    rgb_value = [255, 129, 200]
+    # rgb_value = [249, 55, 255]
+    # rgb_value = [255, 206, 51]
+    rgb_value = [255, 165, 0]
+
     num_images = 1
-    steps = 50
+    steps = 70
     height = 512
     width = 512
-    guidance_scale = 8
-    get_images_with_variant_loss(prompt, version, rgb_value, num_images, steps, height, width, guidance_scale)
+    guidance_scale = 7
+    images = get_images_with_variant_loss(prompt, version, rgb_value, num_images, steps, height, width, guidance_scale)
