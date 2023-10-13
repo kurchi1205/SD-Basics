@@ -21,10 +21,9 @@ def get_images_with_variant_loss(prompt: str, version: str, rgb_value: List, num
     generator = torch.manual_seed(seed)   # Seed generator to create the inital latent noise
 
     text_input = tokenizer([prompt], padding="max_length", max_length=tokenizer.model_max_length, truncation=True, return_tensors="pt")
-    print(text_input.input_ids)
     with torch.no_grad():
         text_embeddings = text_encoder(text_input.input_ids.to(torch_device))[0]
-
+    
     # And the uncond. input as before:
     max_length = text_input.input_ids.shape[-1]
     uncond_input = tokenizer(
@@ -61,30 +60,30 @@ def get_images_with_variant_loss(prompt: str, version: str, rgb_value: List, num
         noise_pred_uncond, noise_pred_text = noise_pred.chunk(2)
         noise_pred = noise_pred_uncond + guidance_scale * (noise_pred_text - noise_pred_uncond)
 
-        ### ADDITIONAL GUIDANCE ###
-#         if i%5 == 0:
-#             # Requires grad on the latents
-#             latents = latents.detach().requires_grad_()
+        ## ADDITIONAL GUIDANCE ###
+        if i%5 == 0:
+            # Requires grad on the latents
+            latents = latents.detach().requires_grad_()
 
-#             # Get the predicted x0:
-#             # latents_x0 = latents - sigma * noise_pred
-#             latents_x0 = scheduler.step(noise_pred, t, latents).pred_original_sample
-#             scheduler._step_index = i
+            # Get the predicted x0:
+            # latents_x0 = latents - sigma * noise_pred
+            latents_x0 = scheduler.step(noise_pred, t, latents).pred_original_sample
+            scheduler._step_index = i
 
-#             # Decode to image space
-#             denoised_images = vae.decode((1 / 0.18215) * latents_x0).sample / 2 + 0.5 # range (0, 1)
-#             # Calculate loss
-#             loss = variant_loss(denoised_images, rgb_value) * variant_loss_scale
+            # Decode to image space
+            denoised_images = vae.decode((1 / 0.18215) * latents_x0).sample / 2 + 0.5 # range (0, 1)
+            # Calculate loss
+            loss = variant_loss(denoised_images, rgb_value) * variant_loss_scale
 
-#             # Occasionally print it out
-#             if i%10==0:
-#                 print(i, 'loss:', loss.item())
+            # Occasionally print it out
+            if i%10==0:
+                print(i, 'loss:', loss.item())
 
-#             # Get gradient
-#             cond_grad = torch.autograd.grad(loss, latents)[0]
+            # Get gradient
+            cond_grad = torch.autograd.grad(loss, latents)[0]
 
-#             # Modify the latents based on this gradient
-#             latents = latents.detach() - cond_grad * sigma**2
+            # Modify the latents based on this gradient
+            latents = latents.detach() - cond_grad * sigma**2
 
         # Now step with scheduler
         latents = scheduler.step(noise_pred, t, latents).prev_sample

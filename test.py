@@ -12,7 +12,7 @@ def test_pipelines():
     for style in styles:
         seed = random.seed(random.random())
         rgb_value = random.choice([[249, 55, 255], [249, 55, 255], [255, 206, 51], [255, 165, 0]])
-        prompt = f"{prompt} in the style of <{style}>"
+        prompt = f"{prompt} in the style of text."
         num_images = 1
         steps = 50
         height = 512
