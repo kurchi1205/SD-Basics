@@ -7,7 +7,7 @@ from pipelines import get_pipelines, load_styles
 from utils import set_timesteps, latents_to_pil
 
 
-def get_images_with_variant_loss(prompt: str, version: str, rgb_value: List, num_images: int, steps: int, height: int, width: int, guidance_scale: float, seed: int = 32, variant_loss_scale: int = 200, style=None, save_images=True):
+def get_images_with_variant_loss(prompt: str, version: str, rgb_value: List, num_images: int, steps: int, height: int, width: int, guidance_scale: float, seed: int = 32, variant_loss_scale: int = 50, style=None, save_images=True):
     pipeline = get_pipelines(version=version)
     if style is not None:
         pipeline = load_styles(style, pipeline)

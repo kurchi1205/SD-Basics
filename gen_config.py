@@ -1,15 +1,15 @@
 
 config_for_gen = {
-    "anders-zorn": {
-        "color_code": [209, 255, 59],
-        "col_name": 'lemon_green',
+    "oil-paint": {
+        "color_code": [255, 0, 102],
+        "col_name": 'fuschia',
         "seed": 30
     },
     
-    "dreamcore": {
+    "midjourney": {
         "color_code": [255, 184, 51],
         "col_name": 'orange',
-        "seed": 35
+        "seed": 50
     },
     
     "manga": {
