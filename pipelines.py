@@ -44,8 +44,26 @@ def get_pipelines(version: str):
     return pipeline
 
 
-def load_styles(style):
+def load_styles(style, pipeline):
 #     styles = ['herge', 'nebula', 'dreamcore',\
 #               'orientalist-art', 'minecraft-concept-art']
+    tokenizer = pipeline['tokenizer']
+    text_encoder = pipeline['text_encoder']
+    state_dict = torch.load(f"styles/{style}_learned_embeds.bin")
+    token = list(state_dict.keys())[0].strip('<>')
+    token_id = tokenizer.convert_tokens_to_ids(token)
+    text_encoder.resize_token_embeddings(len(tokenizer) + 1)
+    input_embeddings = text_encoder.get_input_embeddings().weight
+    input_embeddings.data[token_id] = state_dict[f'<{token}>']
+    text_encoder.get_input_embeddings().weight = input_embeddings
+    pipeline['text_encoder'] = text_encoder
+    return pipeline
     
-    torch.load(f"styles/{style}_learned_embeds.bin")
+if __name__=="__main__":
+    pipeline = get_pipelines('v1')
+    load_styles("rim-illustration", pipeline)
+    text_encoder = pipeline["text_encoder"]
+    input_embeddings = text_encoder.get_input_embeddings().weight
+    print(input_embeddings.data[49407])
+    
+
